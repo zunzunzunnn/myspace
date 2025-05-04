@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Celebration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .birthday-text {
+            font-family: 'Pacifico', cursive;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .photo-frame {
+            border: 15px solid #fff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transform: rotate(-5deg);
+            transition: all 0.3s ease;
+        }
+        
+        .photo-frame:hover {
+            transform: rotate(0deg) scale(1.05);
+        }
+        
+        .cake {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .balloon {
+            position: absolute;
+            width: 40px;
+            height: 50px;
+            border-radius: 50%;
+            animation: balloon-float 8s ease-in-out infinite;
+        }
+        
+        @keyframes balloon-float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-100px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        .confetti-btn {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .confetti-btn:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255,255,255,0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+        
+        .confetti-btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+        
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+        
+        .gallery-item {
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .message-card {
+            perspective: 1000px;
+        }
+        
+        .message-inner {
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .message-card:hover .message-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .message-front, .message-back {
+            backface-visibility: hidden;
+        }
+        
+        .message-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="relative overflow-x-hidden">
+    <!-- Floating Balloons -->
+    <div class="balloon bg-pink-500 top-10 left-10" style="animation-delay: 0s;"></div>
+    <div class="balloon bg-blue-400 top-20 right-20" style="animation-delay: 1s;"></div>
+    <div class="balloon bg-yellow-400 bottom-20 left-20" style="animation-delay: 2s;"></div>
+    <div class="balloon bg-purple-400 bottom-10 right-10" style="animation-delay: 3s;"></div>
+    <div class="balloon bg-green-400 top-1/4 left-1/4" style="animation-delay: 4s;"></div>
+    
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="birthday-text text-5xl md:text-7xl font-bold text-pink-600 mb-4">Happy Birthday!</h1>
+            <div class="relative inline-block">
+                <img src="https://i.imgur.com/9pNffhj.png" alt="Birthday Cake" class="cake w-32 h-32 mx-auto">
+            </div>
+        </header>
+        
+        <!-- Personalized Greeting -->
+        <section class="bg-white rounded-2xl shadow-xl p-6 mb-12 text-center">
+            <h2 class="text-3xl font-bold text-pink-600 mb-4">Dear <span id="name" class="underline decoration-wavy decoration-pink-400">[Name]</span>,</h2>
+            <p class="text-lg text-gray-700 mb-4">Wishing you an amazing day filled with joy, laughter, and happiness!</p>
+            <div class="flex justify-center space-x-4 mt-6">
+                <button onclick="changeName()" class="confetti-btn bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-user-edit mr-2"></i>Customize Name
+                </button>
+                <button onclick="fireConfetti()" class="confetti-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105">
+                    <i class="fas fa-birthday-cake mr-2"></i>Fire Confetti!
+                </button>
+            </div>
+        </section>
+        
+        <!-- Photo Gallery -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Memory Gallery</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/JT4B9Vd.jpg" alt="Birthday memory" class="w-full h-48 object-cover rounded-lg photo-frame">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/5Rc6QHj.jpg" alt="Birthday memory" class="w-full h-48 object-cover rounded-lg photo-frame">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/9pNffhj.jpg" alt="Birthday memory" class="w-full h-48 object-cover rounded-lg photo-frame">
+                </div>
+                <div class="gallery-item">
+                    <img src="https://i.imgur.com/JT4B9Vd.jpg" alt="Birthday memory" class="w-full h-48 object-cover rounded-lg photo-frame">
+                </div>
+            </div>
+        </section>
+        
+        <!-- Interactive Messages -->
+        <section class="mb-12">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Special Messages</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="message-card h-64">
+                    <div class="message-inner relative w-full h-full">
+                        <div class="message-front absolute w-full h-full bg-gradient-to-br from-pink-400 to-pink-600 rounded-xl p-6 flex flex-col justify-center items-center text-white">
+                            <i class="fas fa-heart text-4xl mb-4"></i>
+                            <h3 class="text-xl font-bold">Click to Reveal</h3>
+                        </div>
+                        <div class="message-back absolute w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 rounded-xl p-6 flex flex-col justify-center items-center text-white">
+                            <p class="text-center">May your birthday be as wonderful as you are!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-card h-64">
+                    <div class="message-inner relative w-full h-full">
+                        <div class="message-front absolute w-full h-full bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-xl p-6 flex flex-col justify-center items-center text-white">
+                            <i class="fas fa-star text-4xl mb-4"></i>
+                            <h3 class="text-xl font-bold">Click to Reveal</h3>
+                        </div>
+                        <div class="message-back absolute w-full h-full bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl p-6 flex flex-col justify-center items-center text-white">
+                            <p class="text-center">Wishing you health, wealth and happiness in the year ahead!</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="message-card h-64">
+                    <div class="message-inner relative w-full h-full">
+                        <div class="message-front absolute w-full h-full bg-gradient-to-br from-green-400 to-green-600 rounded-xl p-6 flex flex-col justify-center items-center text-white">
+                            <i class="fas fa-gift text-4xl mb-4"></i>
+                            <h3 class="text-xl font-bold">Click to Reveal</h3>
+                        </div>
+                        <div class="message-back absolute w-full h-full bg-gradient-to-br from-red-400 to-red-600 rounded-xl p-6 flex flex-col justify-center items-center text-white">
+                            <p class="text-center">Another year of amazing adventures awaits you!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Music Player -->
+        <section class="bg-white rounded-2xl shadow-xl p-6 mb-12">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Birthday Music</h2>
+            <div class="flex flex-col items-center">
+                <div class="w-full max-w-md bg-gray-100 rounded-xl p-4">
+                    <div class="flex items-center mb-4">
+                        <img src="https://i.imgur.com/9pNffhj.png" alt="Album cover" class="w-16 h-16 rounded-lg mr-4">
+                        <div>
+                            <h3 class="font-bold">Happy Birthday Song</h3>
+                            <p class="text-sm text-gray-600">Traditional</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <button onclick="togglePlay()" id="playBtn" class="bg-pink-500 hover:bg-pink-600 text-white rounded-full w-12 h-12 flex items-center justify-center">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <audio id="birthdaySong" loop>
+                            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                        <div class="flex-1 mx-4">
+                            <div class="h-1 bg-gray-300 rounded-full">
+                                <div id="progressBar" class="h-1 bg-pink-500 rounded-full w-0"></div>
+                            </div>
+                        </div>
+                        <span id="currentTime" class="text-sm text-gray-600">0:00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Countdown Timer -->
+        <section class="bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl shadow-xl p-6 mb-12 text-white text-center">
+            <h2 class="text-2xl font-bold mb-4">Countdown to Next Birthday</h2>
+            <div class="flex justify-center space-x-2 md:space-x-4">
+                <div class="bg-white bg-opacity-20 rounded-lg p-4 w-20">
+                    <div id="days" class="text-3xl font-bold">00</div>
+                    <div class="text-sm">Days</div>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-lg p-4 w-20">
+                    <div id="hours" class="text-3xl font-bold">00</div>
+                    <div class="text-sm">Hours</div>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-lg p-4 w-20">
+                    <div id="minutes" class="text-3xl font-bold">00</div>
+                    <div class="text-sm">Minutes</div>
+                </div>
+                <div class="bg-white bg-opacity-20 rounded-lg p-4 w-20">
+                    <div id="seconds" class="text-3xl font-bold">00</div>
+                    <div class="text-sm">Seconds</div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Final Greeting -->
+        <section class="text-center mb-12">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <h2 class="text-3xl font-bold text-pink-600 mb-4">Once Again, Happy Birthday!</h2>
+                <p class="text-lg text-gray-700 mb-6">May all your dreams and wishes come true this year. Enjoy your special day to the fullest!</p>
+                <button onclick="fireConfetti()" class="confetti-btn bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white font-bold py-3 px-6 rounded-full transition duration-300 transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-birthday-cake mr-2"></i>Celebrate Again!
+                </button>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-6 text-center">
+        <p>Made with <i class="fas fa-heart text-pink-500"></i> for your special day</p>
+        <p class="text-sm text-gray-400 mt-2">© 2023 Birthday Wishes App</p>
+    </footer>
+    
+    <script>
+        // Change name function
+        function changeName() {
+            const name = prompt("Enter the birthday person's name:", "Friend");
+            if (name) {
+                document.getElementById('name').textContent = name;
+                fireConfetti();
+            }
+        }
+        
+        // Confetti function
+        function fireConfetti() {
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff']
+            });
+            
+            // Play birthday sound
+            const audio = document.getElementById('birthdaySong');
+            audio.currentTime = 0;
+            audio.play();
+            document.getElementById('playBtn').innerHTML = '<i class="fas fa-pause"></i>';
+        }
+        
+        // Music player functionality
+        const audio = document.getElementById('birthdaySong');
+        const playBtn = document.getElementById('playBtn');
+        const progressBar = document.getElementById('progressBar');
+        const currentTime = document.getElementById('currentTime');
+        
+        function togglePlay() {
+            if (audio.paused) {
+                audio.play();
+                playBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                audio.pause();
+                playBtn.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        }
+        
+        audio.addEventListener('timeupdate', function() {
+            // Update progress bar
+            const progress = (audio.currentTime / audio.duration) * 100;
+            progressBar.style.width = progress + '%';
+            
+            // Update current time
+            const minutes = Math.floor(audio.currentTime / 60);
+            const seconds = Math.floor(audio.currentTime % 60);
+            currentTime.textContent = minutes + ':' + (seconds < 10 ? '0' + seconds : seconds);
+        });
+        
+        // Countdown timer
+        function updateCountdown() {
+            // Set the next birthday date (example: December 31, 2023)
+            const now = new Date();
+            let nextBirthday = new Date(now.getFullYear(), 11, 31);
+            
+            // If birthday already passed this year, set for next year
+            if (now > nextBirthday) {
+                nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+            }
+            
+            const diff = nextBirthday - now;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+        
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+        
+        // Initialize with some confetti
+        window.addEventListener('load', function() {
+            setTimeout(fireConfetti, 1000);
+        });
+        
+        // Flip cards on click for mobile
+        document.querySelectorAll('.message-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.querySelector('.message-inner').classList.toggle('rotateY-180');
+            });
+        });
+    </script>
+</body>
+</html>
